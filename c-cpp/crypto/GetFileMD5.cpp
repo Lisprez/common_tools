@@ -1,4 +1,6 @@
 #include <Windows.h>
+constexpr int MD5LEN = 16
+constexpr int BUFSIZE = 1024
 std::tuple<bool, std::string> supervisor::util::GetFileMD5(const std::string& filePath)
 {
 	DWORD dwStatus = 0;
