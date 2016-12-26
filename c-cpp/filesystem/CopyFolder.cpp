@@ -3,13 +3,13 @@ static BOOL CopyFolder_(const std::string& sourceDirPath, const std::string& tar
 	WIN32_FIND_DATA FindFileData;
 	HANDLE hFind;
 	char l_szTmp[1025] = { 0 };
-	memcpy(l_szTmp, sourceDirPath.data(), 1024);
+	memcpy(l_szTmp, sourceDirPath.data(), sourceDirPath.size());
 
 
 	char l_szSrcPath[1025] = { 0 };
 	char l_szDesPath[1025] = { 0 };
-	memcpy(l_szSrcPath, sourceDirPath.data(), 1024);
-	memcpy(l_szDesPath, targetDirPath.data(), 1024);
+	memcpy(l_szSrcPath, sourceDirPath.data(), sourceDirPath.size());
+	memcpy(l_szDesPath, targetDirPath.data(), targetDirPath.size());
 
 	char l_szNewSrcPath[1025] = { 0 };
 	char l_szNewDesPath[1025] = { 0 };

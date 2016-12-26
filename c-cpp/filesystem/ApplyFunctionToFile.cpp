@@ -1,24 +1,32 @@
-static BOOL DeleteFolder_(const std::string& targetDirPath)
+int ApplyFunctionToFile(const std::string& srcFolder, 
+						std::function<int(const std::string&, const std::string&)> comment_remover,
+						const std::string& dstFolder)
 {
 	WIN32_FIND_DATA FindFileData;
 	HANDLE hFind;
 	char l_szTmp[1025] = { 0 };
-	memcpy(l_szTmp, targetDirPath.data(), targetDirPath.size());
+	std::cout << srcFolder.c_str() << std::endl;
+	memcpy(l_szTmp, srcFolder.data(), srcFolder.size());
+
 
 	char l_szSrcPath[1025] = { 0 };
-	memcpy(l_szSrcPath, targetDirPath.data(), targetDirPath.size());
+	char l_szDesPath[1025] = { 0 };
+	memcpy(l_szSrcPath, srcFolder.data(), srcFolder.size());
+	memcpy(l_szDesPath, dstFolder.data(), dstFolder.size());
 
 	char l_szNewSrcPath[1025] = { 0 };
+	char l_szNewDesPath[1025] = { 0 };
 
 	strcat(l_szTmp, "\\*");
+
 	hFind = FindFirstFile(l_szTmp, &FindFileData);
+
 	if (hFind == NULL || hFind == INVALID_HANDLE_VALUE) {
 		return FALSE;
 	}
 
 	do
 	{
-
 		if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		{
 			if (strcmp(FindFileData.cFileName, "."))
@@ -26,8 +34,12 @@ static BOOL DeleteFolder_(const std::string& targetDirPath)
 				if (strcmp(FindFileData.cFileName, ".."))
 				{
 					printf("The Directory found is %s\n", FindFileData.cFileName);
+
+					sprintf(l_szNewDesPath, "%s\\%s", l_szDesPath, FindFileData.cFileName);
+
 					sprintf(l_szNewSrcPath, "%s\\%s", l_szSrcPath, FindFileData.cFileName);
-					DeleteFolder_(l_szNewSrcPath);
+					CreateDirectory(l_szNewDesPath, NULL);
+					ApplyFunctionToFile(l_szNewSrcPath, comment_remover, l_szNewDesPath);
 				}
 			}
 		}
@@ -35,42 +47,13 @@ static BOOL DeleteFolder_(const std::string& targetDirPath)
 		{
 			printf("The File found is %s\n", FindFileData.cFileName);
 			char l_szSrcFile[1025] = { 0 };
+			char l_szDesFile[1025] = { 0 };
+			sprintf(l_szDesFile, "%s\\%s", l_szDesPath, FindFileData.cFileName);
 			sprintf(l_szSrcFile, "%s\\%s", l_szSrcPath, FindFileData.cFileName);
-			if (DeleteFile(l_szSrcFile) == 0)
-			{
-				std::cout << "Delete file error!!!" << std::endl;
-				FindClose(hFind);
-				return FALSE;
-			}
+			comment_remover(l_szSrcFile, l_szDesFile);
 		}
 	} while (FindNextFile(hFind, &FindFileData));
-	if (RemoveDirectory(targetDirPath.c_str()) == 0)
-	{
-		std::cout << "Delete folder error!!!" << std::endl;
-		FindClose(hFind);
-		return FALSE;
-	}
 
 	FindClose(hFind);
 	return TRUE;
-}
-
-bool DeleteFolder(const std::string& folder)
-{
-	if (!supervisor::util::IsDirExist(folder))
-	{
-		return false;
-	}
-
-	try {
-		if (DeleteFolder_(folder) == FALSE)
-		{
-			return false;
-		}
-		return true;
-	}
-	catch (std::exception& e) {
-		std::cout << "[----ERROR---] Delete folder" << e.what() << std::endl;
-		return false;
-	}
 }
