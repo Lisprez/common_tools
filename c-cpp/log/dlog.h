@@ -10,13 +10,20 @@
 	OutputDebugString(strBuffer);\
 } while (0)
 
+#define error_(format, ...) do {\
+	fprintf(stderr, format, __VA_ARGS__)\
+} while (0)
+
+// All this is for debug
 #ifdef _DEBUG
-#define dlog dlog_
-#define dlogf dlogf_
-#define debug2output debug2output_
+#define DLOG dlog_
+#define DLOGF dlogf_
+#define DLOG2OUTPUT debug2output_
 #else
-#define dlog
-#define dlogf
-#define debug2output
+#define DLOG
+#define DLOGF
+#define DLOG2OUTPUT
 #endif
 
+// This below is for log info
+#define ERROR error_
