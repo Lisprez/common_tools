@@ -18,7 +18,8 @@ void modify_content(const std::string& filePath, std::map<std::string, std::stri
 
 		for (auto& x : modifyContent)
 		{
-			std::regex reg(x.first);
+			// set this for pattern match entity world
+			std::regex reg(R"(\b)" + x.first R"(\b)");
 			std::string replacement(x.second);
 			for (auto& line_ : *content)
 			{
