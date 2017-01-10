@@ -1,0 +1,1 @@
+start /d "The application's folder full path" application_name application_command_line_argument
