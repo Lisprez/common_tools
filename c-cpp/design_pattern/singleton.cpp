@@ -1,6 +1,13 @@
 // 类的声明放在.h文件中
 class ModelManager {
 public:
+	// 禁用默认的copy构建与复制构建
+	// 禁用默认的移动copy构建与移动复制构建
+	ModelManager(const ModelManager&) = delete;
+	ModelManager& operator =(const ModelManager&) = delete;
+	ModelManager(const ModelManager&&) = delete;
+	ModelManager& operator =(const ModelManager&&) = delete;
+	
     static ModelManager& Get();
     ~ModelManager();
 

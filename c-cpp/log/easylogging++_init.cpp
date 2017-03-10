@@ -13,7 +13,7 @@ void Easylogging_Setup()
 	el::Configurations conf("easylogging++_conf.txt");
 	el::Loggers::reconfigureAllLoggers(conf);
 	el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
-	el::Loggers::addFlag(el::LoggingFlag::DisableApplicationAbortFatalLog);
+    el::Loggers::addFlag(el::LoggingFlag::DisableApplicationAbortOnFatalLog);
 }
 
 // easylogging++_conf.txt
