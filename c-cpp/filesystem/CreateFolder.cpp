@@ -40,7 +40,11 @@ bool CreateFolder(const std::string& foldPath)
 	if (last_backslash_index == std::string::npos) 
 	{
 		// 表示是一级的相对目录，直接创建
-		CreateDirectory(inner_folder_path.c_str(), nullptr);
+		if (!IsDirExist(inner_folder_path))
+		{
+			CreateDirectory(inner_folder_path.c_str(), nullptr);
+		}
+		
 	}
 	else
 	{
