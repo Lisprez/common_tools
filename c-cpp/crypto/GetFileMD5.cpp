@@ -1,7 +1,15 @@
 #include <Windows.h>
+
+/**
+ * 完全使用Win32 api计算文件的MD5值
+ * 
+ * @param filePath 输入文件的绝对路径
+ *
+ * @return std::tuple<bool, std::string>, bool 表示计算是否成功, string为返回的md5字符串
+ */
 constexpr int MD5LEN = 16
 constexpr int BUFSIZE = 1024
-std::tuple<bool, std::string> supervisor::util::GetFileMD5(const std::string& filePath)
+std::tuple<bool, std::string> GetFileMD5(const std::string& filePath)
 {
 	DWORD dwStatus = 0;
 	BOOL bResult = FALSE;

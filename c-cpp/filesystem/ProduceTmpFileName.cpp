@@ -1,4 +1,11 @@
-// filenamePrefix 只取用其前3个字符作为前缀
+/**
+ * 生成一个临时文件名
+ *
+ * @param parentDirectory 这个临时文件所在的目录的绝对路径
+ * @param filenamePrefix 临时文件名的前缀, 注意:这个前缀无论多长,只取其前3个字母
+ *
+ * @return std::string 返回生成临时文件名的全路径, 失败返回的空字符串
+ */
 std::string ProduceTmpFileName(const std::string& parentDirectory, const std::string& filenamePrefix)
 {
 	char file_name_buf[BUFFER_LENGTH];
