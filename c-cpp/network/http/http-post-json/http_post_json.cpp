@@ -1,3 +1,8 @@
+//切记在Windows下面使用libcurl的时候,
+//时常会出现Winsock被重定义的报错信息
+//这是由于Window自身对于socket接口重新包装所导致的
+//所以一般的解决的方案是将winsock2.h之类的头文件放在当前cpp文件的最前面,以使用编译通过
+
 struct my_string_t {
     char *ptr;
     size_t len;

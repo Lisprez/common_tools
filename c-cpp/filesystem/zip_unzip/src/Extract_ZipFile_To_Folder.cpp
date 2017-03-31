@@ -56,7 +56,10 @@ bool Extract_Zip_File(const std::string& src_file)
 	if (zipFile.open(src_file.c_str())) 
 	{
 		std::string dir_name = src_file.substr(0, src_file.length() - 4);
-		if (_mkdir(dir_name.c_str()) == 0) 
+		//包括两种情况
+		//1.目录不存在就创建目录
+		//2.目录已经存在那就直接返回成功
+		if (_mkdir(dir_name.c_str()) != ENOENT) 
 		{
 			auto filenames = zipFile.getFilenames();
 			for (auto it = filenames.begin(); it != filenames.end(); it++) 
@@ -75,7 +78,6 @@ bool Extract_Zip_File(const std::string& src_file)
 					strncpy(folder, full_folder.c_str(), 128);
 					// 先创建这个多级目录
 					create_multi_level_dir(folder);
-
 					std::replace(item.begin(), item.end(), '/', '\\');
 					middleFile.open((dir_name + "\\" + item).c_str(), std::ostream::binary);
 				}
