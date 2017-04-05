@@ -1,4 +1,12 @@
-static BOOL CopyFolder_(const std::string& sourceDirPath, const std::string& targetDirPath)
+/**
+ * 递归复制一个目录到一个的目录中的所有内容到一个新的目录
+ * 
+ * @param sourceDirPath
+ * @param targetDirPath
+ *
+ * @return BOOL
+ */
+static BOOL copy_folder(const std::string& sourceDirPath, const std::string& targetDirPath)
 {
 	WIN32_FIND_DATA FindFileData;
 	HANDLE hFind;
@@ -18,7 +26,8 @@ static BOOL CopyFolder_(const std::string& sourceDirPath, const std::string& tar
 
 	hFind = FindFirstFile(l_szTmp, &FindFileData);
 
-	if (hFind == NULL || hFind == INVALID_HANDLE_VALUE) {
+	if (hFind == NULL || hFind == INVALID_HANDLE_VALUE) 
+	{
 		return FALSE;
 	}
 
@@ -37,7 +46,7 @@ static BOOL CopyFolder_(const std::string& sourceDirPath, const std::string& tar
 
 					sprintf(l_szNewSrcPath, "%s\\%s", l_szSrcPath, FindFileData.cFileName);
 					CreateDirectory(l_szNewDesPath, NULL);
-					CopyFolder_(l_szNewSrcPath, l_szNewDesPath);
+					copy_folder(l_szNewSrcPath, l_szNewDesPath);
 				}
 			}
 		}
@@ -51,13 +60,19 @@ static BOOL CopyFolder_(const std::string& sourceDirPath, const std::string& tar
 			BOOL l_bRet = CopyFile(l_szSrcFile, l_szDesFile, TRUE);
 
 		}
-
-
 	} while (FindNextFile(hFind, &FindFileData));
 	FindClose(hFind);
 	return TRUE;
 }
 
+/**
+ * 完整复制一个目录到一个新的目录
+ *
+ * @param sourceFolder
+ * @param destFolder
+ *
+ * @return bool
+ */
 bool supervisor::util::CopyFolder(const std::string& sourceFolder, const std::string& destFolder)
 {
 	if (!IsDirExist(sourceFolder))
@@ -71,15 +86,17 @@ bool supervisor::util::CopyFolder(const std::string& sourceFolder, const std::st
 		return false;
 	}
 
-	try {
-		if (CopyFolder_(sourceFolder, destFolder) == FALSE)
+	try 
+	{
+		if (copy_folder(sourceFolder, destFolder) == FALSE)
 		{
 			std::cout << "[----ERROR----] Copy old version file for backup error !!!" << std::endl;
 			return false;
 		}
 		return true;
 	}
-	catch (std::exception& e){
+	catch (std::exception& e)
+	{
 		std::cout << e.what() << std::endl;
 		return false;
 	}

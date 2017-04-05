@@ -1,4 +1,4 @@
-std::map<std::wstring, std::wstring> MimeTypeMap{
+static std::map<std::wstring, std::wstring> MimeTypeMap{
 	{ L".jpeg",	L"image/jpeg" },
 	{ L".jpe",	L"image/jpeg" },
 	{ L".jpg",	L"image/jpeg" },

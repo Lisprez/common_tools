@@ -1,3 +1,8 @@
+/**
+ * 获取系统tmp目录的绝对路径
+ *
+ * @return std::string 空字符串表示失败
+ */
 std::string GetSystemTmpPath(void)
 {
 	char folder_path_buf[1024]{0};

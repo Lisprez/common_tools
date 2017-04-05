@@ -1,7 +1,7 @@
 /**
  * 将string转换成wstring
  * 
- * @param std::string&
+ * @param s
  * 
  * @return std::wstring
  */
@@ -14,7 +14,7 @@ std::wstring string2wstring(const std::string& s)
 /**
  * 将wstring转换成string
  * 
- * @param std::wstring&
+ * @param ws
  * 
  * @return std::string
  */

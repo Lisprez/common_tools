@@ -1,3 +1,12 @@
+/**
+ * 对文件的内容进行就地修改
+ * 
+ * @param srcFolder 源绝对路径
+ * @param modifyContent 键值对map, 键为被修改内容, 值为期望修改成的内容
+ * @param modifier 修改子, 接受一个map和一个修改函数作为参数
+ * 
+ * @return BOOL
+ */
 BOOL ApplyFunctionToFile(const std::string& srcFolder,
                          std::map<std::string, std::string> modifyContent,
                          std::function<void(const std::string& filePath,

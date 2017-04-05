@@ -2,6 +2,14 @@
 #include <string>
 #include <stdarg.h>
 
+/**
+ * 格式化输出到字符串
+ *
+ * @param format c的方式指出输出buf的格式
+ * @param ... 类似printf的变参
+ *
+ * @return std::string
+ */
 std::string format_to_string(const char* format, ...)
 {
     // 此处是定义一个初始的栈上字符数组
@@ -9,12 +17,16 @@ std::string format_to_string(const char* format, ...)
     std::unique_ptr<char[]> release;
     char* base = nullptr;
 
-    for (int iter = 0; iter < 2; iter++) {
+    for (int iter = 0; iter < 2; iter++) 
+	{
         int bufsize = 0;
-        if (iter == 0) {
+        if (iter == 0) 
+		{
             bufsize = sizeof(bufsize);
             base = buffer;
-        } else {
+        } 
+		else 
+		{
             // 表示500不足够的情况下重新在堆上进行处理
             bufsize = 30000;
             base = new char[bufsize];
@@ -23,16 +35,21 @@ std::string format_to_string(const char* format, ...)
 
         char* p = base;
         char* limit = base + bufsize;
-        if (p < limit) {
+        if (p < limit) 
+		{
             va_list ap;
             va_start(ap, fmt);
             p += vsnprintf(p, limit-p, fmt, ap);
             va_end(ap);
         }
-        if (p > limit) {
-            if (iter == 0) {
+        if (p > limit) 
+		{
+            if (iter == 0) 
+			{
                 continue;
-            } else {
+            } 
+			else
+			{
                 p = limit - 1;
                 *p = '\0';
             }

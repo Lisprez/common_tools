@@ -1,9 +1,20 @@
-void traverse_table(lua_State *L, int table_loc) {
+/**
+ * 函数的功能是遍历lua传递到C++中的Table
+ *
+ * @param L
+ * @param table_loc table在lua栈上的逆向索引
+ *
+ * @return void
+ */
+void traverse_table(lua_State *L, int table_loc) 
+{
     // 向栈顶加入一个nil，目的是为了构成一个调用lua_next的环境
     lua_pushnil(L);
     // 此时的栈情景如下:
     // -1 => nil, -2 => table
-    while (lua_next(L, table_loc)) {
+
+    while (lua_next(L, table_loc)) 
+	{
         // -1 => value, -2 => key, -3 => table
         lua_pushvalue(L, -2);
         // -1 => key, -2 => value, -3 => key, -4 => table

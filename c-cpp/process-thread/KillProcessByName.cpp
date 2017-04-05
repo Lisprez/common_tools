@@ -1,3 +1,10 @@
+/**
+ * 类似于9杀的方式去杀死一个进程
+ *
+ * @param processName 完整的进程名称
+ *
+ * return bool
+ */
 bool KillProcessByName(const std::string& processName)
 {
 	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, NULL);

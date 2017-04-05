@@ -1,8 +1,8 @@
 /**
  * 判断一个字符串是否以另一个字符串作为结尾
  *
- * @param src: const std::string&
- * @param test: const std::string&
+ * @param src
+ * @param test
  * 
  * @return bool
  */
@@ -30,8 +30,8 @@ static bool IsEndWith(const std::string& src, const std::string& test)
  * 修改文本文件中的内容, 在文件中寻找到map中的key, 并替换成value
  * 注意: 这是一个完全匹配并替换的过程, 比如 abc_def匹配abc_def, 但是它不匹配abc_defg, 
  * 
- * @param filePath: const std::string& 需要修改的文件的绝对路径
- * @param modifyContent: std::map<std::string, std::string> 要修改的内容组成的map
+ * @param filePath 需要修改的文件的绝对路径
+ * @param modifyContent 要修改的内容组成的map
  * 
  * @return void
  */
@@ -44,7 +44,6 @@ void modify_content(const std::string& filePath, std::map<std::string, std::stri
 
 		while (std::getline(file_before_modify, line))
 		{
-			debug2output("%s\n", line.c_str());
 			if (line.empty())
 			{
 				continue;
@@ -62,7 +61,6 @@ void modify_content(const std::string& filePath, std::map<std::string, std::stri
 			{
 				std::string result = std::regex_replace(line_, reg, replacement);
 				line_ = result;
-				debug2output("%s\n", line_.c_str());
 			}
 		}
 

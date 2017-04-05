@@ -8,20 +8,24 @@ struct my_string_t {
     size_t len;
 };
 
-void init_string(struct my_string_t *s) {
+void init_string(struct my_string_t *s) 
+{
     s->len = 0;
     s->ptr = (char *)malloc(s->len + 1);
-    if (s->ptr == NULL) {
+    if (s->ptr == NULL) 
+	{
         fprintf(stderr, "malloc() failed\n");
         exit(EXIT_FAILURE);
     }
     s->ptr[0] = '\0';
 }
 
-size_t writefunc(void *ptr, size_t size, size_t nmemb, struct my_string_t *s) {
+size_t writefunc(void *ptr, size_t size, size_t nmemb, struct my_string_t *s) 
+{
     size_t new_len = s->len + size * nmemb;
     s->ptr = (char *)realloc(s->ptr, new_len + 1);
-    if (s->ptr == NULL) {
+    if (s->ptr == NULL) 
+	{
         fprintf(stderr, "realloc() failed\n");
         exit(EXIT_FAILURE);
     }
@@ -33,8 +37,10 @@ size_t writefunc(void *ptr, size_t size, size_t nmemb, struct my_string_t *s) {
     return size * nmemb;
 }
 
-void http_post_json() {
-    try {
+bool http_post_json() 
+{
+    try 
+	{
         CURL *pCurl = nullptr;
         CURLcode res;
 
@@ -46,12 +52,13 @@ void http_post_json() {
 
         // get a curl handle
         pCurl = curl_easy_init();
-        if (NULL != pCurl) {
+        if (NULL != pCurl) 
+		{
             my_string_t http_response;
             init_string(&http_response);
 
             // 设置超时时间为1秒
-            curl_easy_setopt(pCurl, CURLOPT_TIMEOUT, 5);
+            curl_easy_setopt(pCurl, CURLOPT_TIMEOUT, 5000);
 
             // First set the URL that is about to receive our POST.
             // This URL can just as well be a
@@ -89,9 +96,10 @@ void http_post_json() {
             // Perform the request, res will get the return code
             res = curl_easy_perform(pCurl);
             // Check for errors
-            if (res != CURLE_OK) {
-                printf("curl_easy_perform() failed:%s\n",
-                       curl_easy_strerror(res));
+            if (res != CURLE_OK) 
+			{
+                printf("curl_easy_perform() failed:%s\n", curl_easy_strerror(res));
+				return false;
             }
             // always cleanup
             curl_easy_cleanup(pCurl);
@@ -100,16 +108,20 @@ void http_post_json() {
             using json = nlohmann::json;
             auto jsonStructure = json::parse(http_response.ptr);
             std::cout << http_response.ptr << std::endl;
-            if (jsonStructure["code"].get<std::string>() == "10000") {
+            if (jsonStructure["code"].get<std::string>() == "10000") 
+			{
                 LOG(INFO) << "Inform succeed.";
-                lua_pushboolean(L, true);
-            } else {
-                std::cout << "fuck error" << std::endl;
-                lua_pushboolean(L, false);
+                return true;
+            } 
+			else
+			{
+				return false;
             }
         }
         curl_global_cleanup();
-    } catch (std::exception &ex) {
+    } 
+	catch (std::exception &ex) 
+	{
         printf("curl exception %s.\n", ex.what());
     }
 }

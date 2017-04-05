@@ -12,13 +12,14 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
 }
 
 
-bool supervisor::util::HttpGetFile(const std::string& staticUrlPath, const std::string& toSavedFilePath)
+bool HttpGetFile(const std::string& staticUrlPath, const std::string& toSavedFilePath)
 {
 	CURL* curl = nullptr;
 	CURLcode res;
 	FILE* hd_src;
 	struct stat file_info;
-	try {
+	try 
+	{
 		stat(toSavedFilePath.c_str(), &file_info);
 		fopen_s(&hd_src, toSavedFilePath.c_str(), "wb");
 		curl_global_init(CURL_GLOBAL_ALL);
@@ -39,10 +40,16 @@ bool supervisor::util::HttpGetFile(const std::string& staticUrlPath, const std::
 				curl_global_cleanup();
 				return false;
 			}
-			else
-			{
-				std::cout << "[supervisor log] curl perform succeed." << std::endl;
-			}
+			long status_code = 0;
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status_code);
+            if (status_code != 200) //表示文件并没有准备好,文件可能并不存在
+            {
+                fclose(hd_src);
+                curl_easy_cleanup(curl);
+                curl_global_cleanup();
+                work_finished.store(true);
+                return false;
+            }
 		}
 		else
 		{
@@ -57,7 +64,8 @@ bool supervisor::util::HttpGetFile(const std::string& staticUrlPath, const std::
 		curl_global_cleanup();
 		return true;
 	}
-	catch (std::exception& e) {
+	catch (std::exception& e) 
+	{
 		std::cout << e.what() << std::endl;
 		fclose(hd_src);
 		if (curl != nullptr)

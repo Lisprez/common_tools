@@ -42,14 +42,15 @@ static std::string get_parent_path(const std::string& path)
 }
 
 /**
- * 判断一个文件(普通文件或者目录)是否位于另一个目录中 
+ * 判断一个指定的文件(普通文件或者目录)是否位于另一个目录中, 假设这个文件是已经存在的
+ * 这个函数里没有对这个文件是否存在进行检查
  * 
  * @param fullPathFileName 用于判断的文件
  * @param fullPathDirName 目标目录
  * 
  * @return bool 
  */
-static bool is_file_belong_to(const std::string& fullPathFileName, 
+bool IsFileBelongTo(const std::string& fullPathFileName, 
                               const std::string& fullPathDirName)
 {
     std::string parent_path = get_parent_path(fullPathDirName);

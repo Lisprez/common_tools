@@ -1,3 +1,10 @@
+/**
+ * 判断一个进程是否还存在于进程列表中
+ * 
+ * @param processName 进程的完整名称
+ *
+ * @return bool
+ */
 bool IsProcessExists(const std::string& processName)
 {
 	auto result = false;

@@ -1,4 +1,11 @@
-static BOOL DeleteFolder_(const std::string& targetDirPath)
+/**
+ * 递归删除一个目录的所有内容
+ * 
+ * @param targetDirPath
+ *
+ * @return BOOL: TRUE, FALSE
+ */
+static BOOL delete_folder(const std::string& targetDirPath)
 {
 	WIN32_FIND_DATA FindFileData;
 	HANDLE hFind;
@@ -27,7 +34,7 @@ static BOOL DeleteFolder_(const std::string& targetDirPath)
 				{
 					printf("The Directory found is %s\n", FindFileData.cFileName);
 					sprintf(l_szNewSrcPath, "%s\\%s", l_szSrcPath, FindFileData.cFileName);
-					DeleteFolder_(l_szNewSrcPath);
+					delete_folder(l_szNewSrcPath);
 				}
 			}
 		}
@@ -44,6 +51,7 @@ static BOOL DeleteFolder_(const std::string& targetDirPath)
 			}
 		}
 	} while (FindNextFile(hFind, &FindFileData));
+	
 	if (RemoveDirectory(targetDirPath.c_str()) == 0)
 	{
 		std::cout << "Delete folder error!!!" << std::endl;
@@ -55,6 +63,13 @@ static BOOL DeleteFolder_(const std::string& targetDirPath)
 	return TRUE;
 }
 
+/**
+ * 删除一个指定目录及其内容
+ *
+ * @param folder 指定目录的绝对路径
+ *
+ * @return bool
+ */
 bool DeleteFolder(const std::string& folder)
 {
 	if (!supervisor::util::IsDirExist(folder))
@@ -62,14 +77,16 @@ bool DeleteFolder(const std::string& folder)
 		return false;
 	}
 
-	try {
-		if (DeleteFolder_(folder) == FALSE)
+	try 
+	{
+		if (delete_folder(folder) == FALSE)
 		{
 			return false;
 		}
 		return true;
 	}
-	catch (std::exception& e) {
+	catch (std::exception& e) 
+	{
 		std::cout << "[----ERROR---] Delete folder" << e.what() << std::endl;
 		return false;
 	}

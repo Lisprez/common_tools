@@ -1,3 +1,11 @@
+/**
+ * 对一个目录中的每一个文件(递归)执行一个指定的函数, 交将结果文件保存到一个指定的位置
+ * 
+ * @param srcFolder 源目录的绝对路径
+ * @param comment_remover 操作子, 它接受两个文件绝对路径作为参数, 返回一个表示执行情况的int, 以表证执行情况
+ * 
+ * @return int
+ */
 int ApplyFunctionToFile(const std::string& srcFolder, 
 						std::function<int(const std::string&, const std::string&)> comment_remover,
 						const std::string& dstFolder)
