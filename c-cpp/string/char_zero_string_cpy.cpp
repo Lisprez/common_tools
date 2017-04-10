@@ -23,7 +23,7 @@ int SafeStrCpy(char* dest, char* src, int max_bytes)
 		src_len_with_zero = max_bytes;
 	}
 	memcpy(dest, src, src_len_with_zero);
-	*(dest+src_len-1) = '\0';
+	*(dest+src_len_with_zero-1) = '\0';
 
 SafeStrCpy_END:
 	return src_len_with_zero;

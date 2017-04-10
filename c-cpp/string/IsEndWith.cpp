@@ -7,12 +7,5 @@ bool IsEndWith(const std::string& src, const std::string& test)
 		return false;
 	}
 	std::string end_str = src.substr(src_len - test_len, src_len - 1);
-	if (test == end_str)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return end_str == test;
 }
