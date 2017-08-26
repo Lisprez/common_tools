@@ -1,0 +1,113 @@
+###############################################
+# 用CMake最大的好处就是管理工程在物理目录的组织上和
+# 代码的逻辑可以最大程度的统一, 但是这也同时产生了一
+# 个问题, 特别是在VS中进行工程的开发的时候, 因为眼睛
+# 看到的表现和实际的工程文件组织不一致, 典型的过度封
+# 装的表现
+# 所以制定下的面统一项目管理, 为我自己
+# 根据逻辑来组织代码, 一个模块一个目录, 目录里面分inc, src
+# 所有的库输出到build目录的lib目录中去, 代码总的组织
+# 与结构参考Rob
+###############################################
+
+###############################################
+# 这里是顶层CMakeLists.txt
+###############################################
+
+# CMake 版本限制
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+
+# 项目名称
+PROJECT(project_name)
+
+# 清空CMake默认的一些编译选项
+SET(CMAKE_C_FLAGS "")
+SET(CMAKE_CXX_FLAGS "")
+SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+
+# 向工程中引入子项目(子项目中有对应的CMakeLists.txt)
+ADD_SUBDIRECTORY(sub_folder_1)
+ADD_SUBDIRECTORY(sub_folder_2)
+
+#################################################
+# 这里是sub_folder_1/CMakeLists.txt
+#################################################
+
+# CMake 版本限制
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+
+# 项目名称
+PROJECT(project_name)
+
+# 清空CMake默认的一些编译选项
+SET(CMAKE_C_FLAGS "")
+SET(CMAKE_CXX_FLAGS "")
+SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+# 定义变量 EXEC 为 bin, 表示生成可执行文件
+SET(EXEC bin)
+
+# 定义变量 INC_DIR, 头文件路径列表
+SET(INC_DIR
+    ${PROJECT_SOURCE_DIR}
+    /usr/include/
+    /usr/local/msgpack/include/
+)
+
+# 将 INC_DIR 添加到工程的头文件搜索列表中
+INCLUDE_DIRECTORIES(${INC_DIR})
+
+# 定义 LIB_DIR, 表示库文件目录列表
+SET(NOT_SYS_LIB_DIR ${PROJECT_BINARY_DIR}/lib)
+FILE(MAKE_DIRECTORY ${NO_SYS_LIB_DIR})
+
+SET(ALL_LIB_DIRS
+    ${NOT_SYS_LIB_DIR}
+    /usr/local/msgpack/lib/
+)
+
+# 将 LIB_DIR 添加到工程库文件列表中
+LINK_DIRECTORIES(${ALL_LIB_DIR})
+
+# 创建目录
+SET(BIN_DIR
+    /usr/local/main/bin
+)
+FILE(MAKE_DIRECTORY ${BIN_DIR})
+
+# 指定编译器与编译选项
+SET(CMAKE_CXX_COMPILER "g++")
+SET(CMAKE_CXX_FLAGS "-Wall -std=c++11 -pipe -FPIC -gdwarf-2 -g3")
+
+# 指定可执行文件输出目录
+SET(BIN_PATH /usr/local/main/bin)
+SET(EXECUTABLE_OUTPUT_PATH ${BIN_PATH})
+
+# 指定需要链接的库
+SET(ALL_LIBS math msgpack)
+TARGET_LINK_LIBRARIES(${EXEC} ${LIBS})
+
+# 将当前目录下的所有源文件加入工程中
+AUX_SOURCE_DIRECTORY(${CMAKE_CURRENT_SOURCE_DIR} SRC)
+ADD_EXECUTABLE(${EXEC} ${SRC})
+
+#########################################################
+# 这里是sub_folder_2/CMakeLists.txt
+#########################################################
+
+# CMake 版本限制
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+
+# 项目名称
+PROJECT(project_name)
+
+# 清空CMake默认的一些编译选项
+SET(CMAKE_C_FLAGS "")
+SET(CMAKE_CXX_FLAGS "")
+SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+
+# 设置库的输出目录
+SET(OUT_DIR ${PROJECT_BINARY_DIR}/lib)
+SET(LIBRARY_OUTPUT_PATH ${OUT_DIR})

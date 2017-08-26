@@ -1,0 +1,30 @@
+# CMake 版本限制
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+
+# 项目名称
+PROJECT(project_name)
+
+# 清空CMake默认的一些编译选项
+SET(CMAKE_C_FLAGS "")
+SET(CMAKE_CXX_FLAGS "")
+SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+
+SET(PROJ_TYPE bin)
+
+SET(SRC_DIR_LIST 
+    ${CMAKE_ROOT}/my_code/module_1/inc
+    ${CMAKE_ROOT}/my_code/module_1/src
+    ${CMAKE_ROOT}/my_code/module_2/inc
+    ${CMAKE_ROOT}/my_code/module_2/src
+)
+
+SET(INC_DIR_LIST
+    ${CMAKE_ROOT}/my_code/module_1/inc
+    ${CMAKE_ROOT}/my_code/module_2/inc
+)
+
+INCLUDE_DIRECTORIES(${INC_DIR_LIST})
+
+AUX_SOURCE_DIRECTORY(${SRC_DIR_LIST} SRC_FILE_LIST)
+ADD_EXECUTABLE(${PROJ_TYPE} ${SRC_FILE_LIST})
