@@ -2,6 +2,8 @@
 // 因为这里是静态库，所以一定要是定义下面这个宏
 // CURL_STATICLIB
 // 否则无法通过编译
+// windows平台进行链接的时候, 链接器需要链接: ws2_32.lib
+// 否则无法通过编译, 主要是因为Win32使用了一套与Posix不同的socket接口
 
 #include "curl/curl.h"
 

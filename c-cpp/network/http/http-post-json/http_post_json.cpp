@@ -37,6 +37,12 @@ size_t writefunc(void *ptr, size_t size, size_t nmemb, struct my_string_t *s)
     return size * nmemb;
 }
 
+/**
+ * libcurl是一个C库, 根据不会抛出异常, 函数体中的Try Catch
+ * 是为了应对JSON.hpp这个C++11的JSON解析库可以抛出的异常而准备的.
+ * 如果程序能够用C的错误处理不会太乱太杂, 那就尽量用C的直白的错误
+ * 处理来写, 而不是引入C++的异常
+ */
 bool http_post_json() 
 {
     try 
