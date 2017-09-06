@@ -1,23 +1,38 @@
 #include "multidowner.h"
 
+#include <map>
 #include <string>
 #include <iostream>
-
+#include <cassert>
+#include <vector>
+#include <sstream>
 
 
 int main(int argc, const char* argv[])
 {
-	std::string url{ "http://127.0.0.1/fuck.zip" };
-	std::string file_path_name{ "chao_fuck.zip" };
+	if (argc != 3)
+	{
+		printf("Usage: fuck_downer FileName Url\n"
+			"\tFileName: your local filename to saved for.\n"
+			"\tURL: the http url of download target\n"
+			);
+
+		return -1;
+	}
+
+
+	const char* file_path_name = argv[1];
+	const char* url = argv[2];
+
 	bool res = multidown::MultiDownload(url, file_path_name);
 
 	if (res)
 	{
-		std::cout << "download success";
+		printf("Download success\n");
 	}
 	else
 	{
-		std::cout << "download error";
+		printf("Download error\n");
 	}
 
 	return 0;

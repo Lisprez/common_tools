@@ -2,6 +2,7 @@
 #include "curl.h"
 
 #include <iostream>
+#include <sstream>
 #include <thread>
 #include <mutex>
 #include <chrono>
@@ -9,6 +10,8 @@
 #include <vector>
 #include <ctime>
 #include "join-piece.h"
+#include <cassert>
+#include <vector>
 
 
 static bool support_range = false;
@@ -27,8 +30,7 @@ struct Node
 static size_t write_function(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	Node *node = (Node *)userdata;
-	size_t written = fwrite(ptr, size, nmemb, node->fp);
-	return written;
+	return fwrite(ptr, size, nmemb, node->fp);
 }
 
 int progress_func(void *ptr, double totalToDownload, double nowDownloaded, double totalToUpLoad, double nowUpLoaded)
@@ -41,7 +43,7 @@ int progress_func(void *ptr, double totalToDownload, double nowDownloaded, doubl
 
 	if (percent % 20 == 0)
 	{
-		printf("下载进度%0d%%\n", percent);
+		printf("....%0d%%\n", percent);
 	}
 
 	return 0;
@@ -65,15 +67,21 @@ static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
  * 获取目录文件的大小, 同时检查远程Http服务器是否支持对目录文件的Range
  * 通过全局变量的support_range来标记
  */
-long get_target_file_size_and_check_range_support(const char *url)
+long get_target_file_size_and_check_range_support(const char *url, const std::vector<std::string>& params)
 {
 	double target_file_size = 0;
+	struct curl_slist* header_chunk = nullptr;
+	for (const std::string& item : params)
+	{
+		header_chunk = curl_slist_append(header_chunk, item.c_str());
+	}
 	CURL* handle = curl_easy_init();
 	if (!handle)
 	{
-		printf("curl_easy_init error...\n");
+		//printf("curl_easy_init error...\n");
 		return -1;
 	}
+	curl_easy_setopt(handle, CURLOPT_HTTPHEADER, header_chunk);
 	curl_easy_setopt(handle, CURLOPT_URL, url);
 	curl_easy_setopt(handle, CURLOPT_HEADER, 1);	//只需要header头
 	curl_easy_setopt(handle, CURLOPT_NOBODY, 1);	//不需要body
@@ -82,11 +90,12 @@ long get_target_file_size_and_check_range_support(const char *url)
 
 	if (curl_easy_perform(handle) == CURLE_OK)
 	{
+		//curl_easy_getinfo(handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &target_file_size);
 		curl_easy_getinfo(handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &target_file_size);
 	}
 	else
 	{
-		printf("curl_easy_perform error...\n");
+		//printf("curl_easy_perform error...\n");
 		target_file_size = -1;
 	}
 
@@ -109,7 +118,7 @@ void* work_thread(void *pData)
 
 		if (res != CURLcode::CURLE_OK)
 		{
-			printf("curl_easy_perform error...\n");
+			//printf("curl_easy_perform error...\n");
 			std::this_thread::sleep_for(std::chrono::seconds(3));
 			if (try_count >= 20)
 			{
@@ -122,7 +131,7 @@ void* work_thread(void *pData)
 
 	curl_easy_cleanup(pNode->curl);
 
-	printf("Thread %ld finished\n", pNode->tid);
+	//printf("Thread %ld finished\n", pNode->tid);
 
 	delete pNode;
 
@@ -133,7 +142,7 @@ void* work_thread(void *pData)
 std::string get_utc()
 {
 	auto timestamp = std::chrono::seconds(std::time(nullptr));
-	int seconds = std::chrono::seconds(timestamp).count();
+	__int64 seconds = std::chrono::seconds(timestamp).count();
 	auto str = std::to_string(seconds);
 	return str;
 }
@@ -144,20 +153,20 @@ std::string get_utc()
  * @Url 目录文件url
  * @filePathName 要落地保存的文件名
  */
-multidown::DownloadStatus my_downLoad(int threadNum, std::string Url, const std::string& filePathName)
+multidown::DownloadStatus my_downLoad(int threadNum, std::string Url, const std::string& filePathName, const std::vector<std::string>& params)
 {
 	std::vector<std::thread*> threads;
 	std::thread* thread_ptr{ nullptr };
 	std::vector<FILE*> file_pointers;
 	curl_global_init(CURL_GLOBAL_ALL);
-	std::string file_chunk_name = get_utc();
+	std::string file_chunk_name{ std::move(get_utc()) };
 
-	long file_length = get_target_file_size_and_check_range_support(Url.c_str());
+	long file_length = get_target_file_size_and_check_range_support(Url.c_str(), params);
 	int real_thread_num = threadNum;
 
 	if (file_length <= 0)
 	{
-		printf("Get the file length error...\n");
+		//printf("Get the file length error...\n");
 		return multidown::DownloadStatus::TARGET_FILE_SIZE_ERROR;
 	}
 	
@@ -179,7 +188,6 @@ multidown::DownloadStatus my_downLoad(int threadNum, std::string Url, const std:
 		}
 		else
 		{
-			printf("Open chunk file error...\n");
 			return multidown::DownloadStatus::OPEN_CHUNK_FILE_ERROR;
 		}
 
@@ -212,7 +220,14 @@ multidown::DownloadStatus my_downLoad(int threadNum, std::string Url, const std:
 		snprintf(range, sizeof(range), "%ld-%ld", pNode->start_pos, pNode->end_pos);
 
 		// Config the easy structure
+		struct curl_slist* header_chunk = nullptr;
+		for (const std::string& item : params)
+		{
+			header_chunk = curl_slist_append(header_chunk, item.c_str());
+		}
+		CURL* handle = curl_easy_init();
 		curl_easy_setopt(curl, CURLOPT_URL, Url.c_str());
+		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header_chunk);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_function);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)pNode);
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
@@ -239,7 +254,7 @@ multidown::DownloadStatus my_downLoad(int threadNum, std::string Url, const std:
 
 	curl_global_cleanup();
 
-	printf("All threads finished...\n");
+	//printf("All threads finished...\n");
 
 	multidown::JoinFile(file_chunk_name, filePathName);
 	multidown::RemoveAllChunkFiles(file_chunk_name);
@@ -251,9 +266,89 @@ multidown::DownloadStatus my_downLoad(int threadNum, std::string Url, const std:
 
 namespace multidown {
 
+	unsigned char ToHex(unsigned char x)
+	{
+		return  x > 9 ? x + 55 : x + 48;
+	}
+
+	unsigned char FromHex(unsigned char x)
+	{
+		unsigned char y;
+		if (x >= 'A' && x <= 'Z') y = x - 'A' + 10;
+		else if (x >= 'a' && x <= 'z') y = x - 'a' + 10;
+		else if (x >= '0' && x <= '9') y = x - '0';
+		else assert(0);
+		return y;
+	}
+
+	std::string UrlEncode(const std::string& str)
+	{
+		std::string strTemp = "";
+		size_t length = str.length();
+		for (size_t i = 0; i < length; i++)
+		{
+			if (isalnum((unsigned char)str[i]) ||
+				(str[i] == '-') ||
+				(str[i] == '_') ||
+				(str[i] == '.') ||
+				(str[i] == '~'))
+				strTemp += str[i];
+			else if (str[i] == ' ')
+				strTemp += "+";
+			else
+			{
+				strTemp += '%';
+				strTemp += ToHex((unsigned char)str[i] >> 4);
+				strTemp += ToHex((unsigned char)str[i] % 16);
+			}
+		}
+		return strTemp;
+	}
+
+	std::string UrlDecode(const std::string& str)
+	{
+		std::string strTemp = "";
+		size_t length = str.length();
+		for (size_t i = 0; i < length; i++)
+		{
+			if (str[i] == '+') strTemp += ' ';
+			else if (str[i] == '%')
+			{
+				assert(i + 2 < length);
+				unsigned char high = FromHex((unsigned char)str[++i]);
+				unsigned char low = FromHex((unsigned char)str[++i]);
+				strTemp += high * 16 + low;
+			}
+			else strTemp += str[i];
+		}
+		return strTemp;
+	}
+
 	bool MultiDownload(const std::string& url, const std::string& filePathName, int threadNum /*= 8*/)
 	{
-		multidown::DownloadStatus res = my_downLoad(threadNum, url, filePathName);
+		std::string decoded_url = UrlDecode(url);
+		std::string delimiter{ "?" };
+
+		std::string::size_type delimiter_pos = decoded_url.find(delimiter);
+		std::vector<std::string> parameter{};
+		if (delimiter_pos != std::string::npos)
+		{
+			std::string real_file_url = decoded_url.substr(0, delimiter_pos);
+			std::string parameter_part = decoded_url.substr(delimiter_pos + 1, decoded_url.length());
+			std::istringstream parameter_part_stream(parameter_part);
+			std::string middle;
+			while (std::getline(parameter_part_stream, middle, '&'))
+			{
+				parameter.push_back(middle);
+			}
+
+			for (std::string& item : parameter)
+			{
+				item.replace(item.find("="), 1, 1, ':');
+			}
+		}
+
+		multidown::DownloadStatus res = my_downLoad(threadNum, url, filePathName, parameter);
 
 		switch (res) {
 		case multidown::DownloadStatus::OPEN_CHUNK_FILE_ERROR:
