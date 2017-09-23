@@ -1,0 +1,14 @@
+set(CXX_FLAGS
+    -g
+    -Wall
+    -Wextra
+    -Werror
+    -Wconversion
+    -Wno-unused-parameter
+    -Wold-style-cast
+    -Woverloaded-virtual
+    -Wpointer-arith
+    -Wshadow
+    -Wwrite-strings
+    -march=native
+    -std=c++11)
